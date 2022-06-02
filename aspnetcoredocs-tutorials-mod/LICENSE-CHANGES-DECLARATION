@@ -1,0 +1,22 @@
+Modification of samples from AspNetCoreDocs
+
+The examples in this folder and subfolders are based on samples contained in the AspNetCoreDocs repo and are subject to the licensing therein, copies of MIT and CC4 licenses in same folder as this readme.
+
+https://github.com/dotnet/AspNetCore.Docs
+
+
+Original source:
+https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials
+
+First Web API Tutorial Mod
+--------------------------
+original path:
+https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/first-web-api
+
+Local copies and modification:
+/first-web-api
+
+extended the code for the purpose of creating a kubernetes training example based on the application
+- to communicate with additional service
+- added dockerfile
+- added kubernetes deployment config
