@@ -3,7 +3,37 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoApi", "TodoApiDTO\TodoApi.csproj", "{9096DBE1-979D-4FF4-9A39-028A4A025AFD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TodoService", "TodoService\TodoService.csproj", "{47D2DF0F-6948-4C9C-A6EA-E0836ED5A496}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{2E5FE47B-6A02-4766-B759-72C694570276}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\README.md = Docs\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LICENSE", "LICENSE", "{78670BC8-4A06-45AC-AFF8-1DC8B3F49770}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\LICENSE = ..\..\..\LICENSE
+		..\..\..\LICENSE-CHANGES-DECLARATION = ..\..\..\LICENSE-CHANGES-DECLARATION
+		..\..\..\LICENSE-CODE = ..\..\..\LICENSE-CODE
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9096DBE1-979D-4FF4-9A39-028A4A025AFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9096DBE1-979D-4FF4-9A39-028A4A025AFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9096DBE1-979D-4FF4-9A39-028A4A025AFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9096DBE1-979D-4FF4-9A39-028A4A025AFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47D2DF0F-6948-4C9C-A6EA-E0836ED5A496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47D2DF0F-6948-4C9C-A6EA-E0836ED5A496}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47D2DF0F-6948-4C9C-A6EA-E0836ED5A496}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47D2DF0F-6948-4C9C-A6EA-E0836ED5A496}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

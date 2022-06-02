@@ -17,6 +17,8 @@ Local copies and modification:
 /first-web-api
 
 extended the code for the purpose of creating a kubernetes training example based on the application
-- to communicate with additional service
-- added dockerfile
-- added kubernetes deployment config
+- refactored data context code into a second project, TodoService ( in progress )
+- to communicate with additional service(s)  ( in progress )
+- added dockerfile(s)
+- implementation and config changes for containerised microservice support ( in progress )
+- added kubernetes deployment config ( in progress )
