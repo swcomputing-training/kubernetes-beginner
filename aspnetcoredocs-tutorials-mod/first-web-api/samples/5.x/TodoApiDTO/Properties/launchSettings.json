@@ -1,19 +1,19 @@
 {
-  "profiles": {
-    "TodoApi": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+   "profiles": {
+      "TodoApi": {
+         "commandName": "Project",
+         "launchBrowser": true,
+         "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development"
+         },
+         "applicationUrl": "https://localhost:51278;http://localhost:51279"
       },
-      "applicationUrl": "https://localhost:51278;http://localhost:51279"
-    },
-    "Docker": {
-      "commandName": "Docker",
-      "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-      "publishAllPorts": true,
-      "useSSL": true
-    }
-  }
+      "Docker": {
+         "commandName": "Docker",
+         "launchBrowser": true,
+         "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+         "publishAllPorts": true,
+         "useSSL": true
+      }
+   }
 }
