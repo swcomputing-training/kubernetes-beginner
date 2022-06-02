@@ -1,2 +1,2 @@
-# kubernetes-local-dev
-Resources and guidance for local kubernetes dev
+# kubernetes-beginner
+Resources and guidance for beginner kubernetes dev
