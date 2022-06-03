@@ -1,140 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
+using TodoModel;
 
-namespace TodoApi.Controllers
+namespace TodoService.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TodoItemsController : ControllerBase
-    {
-        private readonly TodoContext _context;
+   [Route("api/[controller]")]
+   [ApiController]
+   public class TodoItemsController : ControllerBase
+   {
+      /// <summary>
+      /// ref: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-6.0
+      /// </summary>
+      private readonly IHttpClientFactory _httpClientFactory;
 
-        public TodoItemsController(TodoContext context)
-        {
-            _context = context;
-        }
+      /// <summary>
+      /// Use HttpClient extension methods for json serialise/deserialise ( System.Text.Json implementation )
+      /// ref: https://docs.microsoft.com/en-us/dotnet/api/system.net.http.json.httpclientjsonextensions?view=net-5.0
+      /// alternatively create similar extension methods with Newtonsoft implementation.
+      /// </summary>
+      private readonly HttpClient _httpClient;
 
-        #region snippet
-        // GET: api/TodoItems
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
-        {
-            return await _context.TodoItems
-                .Select(x => ItemToDTO(x))
-                .ToListAsync();
-        }
+      public TodoItemsController(IHttpClientFactory httpClientFactory)
+      {
+         _httpClientFactory = httpClientFactory;
+         _httpClient = _httpClientFactory.CreateClient("TodoService");
+         _httpClient.BaseAddress = new Uri(Environment.GetEnvironmentVariable("TODO_SERVICE_BASE_URL") ??
+                                           throw new InvalidOperationException());
+      }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItemDTO>> GetTodoItem(long id)
-        {
-            var todoItem = await _context.TodoItems.FindAsync(id);
+      #region helpers
 
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
+      /// <summary>
+      /// Relays simple no object results from internal HTTP Service endpoints.
+      /// </summary>
+      /// <param name="responseMessage"></param>
+      /// <returns></returns>
+      private IActionResult GetActionResult(HttpResponseMessage responseMessage)
+      {
+         switch (responseMessage.StatusCode)
+         {
+            case HttpStatusCode.BadRequest:
+               return BadRequest();
+            case HttpStatusCode.NotFound:
+               return NotFound();
+            default:
+               return NoContent();
+         }
+      }
 
-            return ItemToDTO(todoItem);
-        }
+      #endregion
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTodoItem(long id, TodoItemDTO todoItemDTO)
-        {
-            if (id != todoItemDTO.Id)
-            {
-                return BadRequest();
-            }
+      #region snippet
 
-            var todoItem = await _context.TodoItems.FindAsync(id);
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
+      // GET: api/TodoItems
+      [HttpGet]
+      public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
+      {
+         // TODO: Override .NET HttpClient ... extensions to handle expected results without exceptions - eg empty array. May want to use NewtonSoft if going to that trouble!
+         var response = await _httpClient.GetFromJsonAsync<ActionResult<IEnumerable<TodoItemDTO>>>($"/api/TodoItems");
+         return response;
+      }
 
-            todoItem.Name = todoItemDTO.Name;
-            todoItem.IsComplete = todoItemDTO.IsComplete;
+      [HttpGet("{id}")]
+      public async Task<ActionResult<TodoItemDTO>> GetTodoItem(long id)
+      {
+         // TODO: Override .NET HttpClient ... extensions to handle expected results without exceptions - eg not found which has useful response from DB
+         var response = await _httpClient.GetFromJsonAsync<ActionResult<TodoItemDTO>>($"/api/TodoItems/{id}");
+         return response;
+      }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
-            {
-                return NotFound();
-            }
+      [HttpPut("{id}")]
+      public async Task<IActionResult> UpdateTodoItem(long id, TodoItemDTO todoItemDTO)
+      {
+         var response = await _httpClient.PutAsJsonAsync<TodoItemDTO>($"/api/TodoItems/{id}", todoItemDTO);
+         return GetActionResult(response);
+      }
 
-            return NoContent();
-        }
+      [HttpPost]
+      public async Task<ActionResult<TodoItemDTO>> CreateTodoItem(TodoItemDTO todoItemDTO)
+      {
+         var response = await _httpClient.PostAsJsonAsync<TodoItemDTO>($"/api/TodoItems", todoItemDTO);
+         TodoItemDTO todoItemDto = await response.Content.ReadFromJsonAsync<TodoItemDTO>();
 
-        [HttpPost]
-        public async Task<ActionResult<TodoItemDTO>> CreateTodoItem(TodoItemDTO todoItemDTO)
-        {
-            var todoItem = new TodoItem
-            {
-                IsComplete = todoItemDTO.IsComplete,
-                Name = todoItemDTO.Name
-            };
+         return CreatedAtAction(nameof(GetTodoItem), new {id = todoItemDto.Id}, todoItemDto);
+      }
 
-            _context.TodoItems.Add(todoItem);
-            await _context.SaveChangesAsync();
+      [HttpDelete("{id}")]
+      public async Task<IActionResult> DeleteTodoItem(long id)
+      {
+         var response = await _httpClient.DeleteAsync($"/api/TodoItems/{id}");
+         return GetActionResult(response);
+      }
 
-            return CreatedAtAction(
-                nameof(GetTodoItem),
-                new { id = todoItem.Id },
-                ItemToDTO(todoItem));
-        }
+      #endregion
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodoItem(long id)
-        {
-            var todoItem = await _context.TodoItems.FindAsync(id);
+      // This method is just for testing populating the secret field
+      // POST: api/TodoItems/test
+      [HttpPost("test")]
+      public async Task<ActionResult<TodoItem>> PostTestTodoItem(TodoItem todoItem)
+      {
+         var response = await _httpClient.PostAsJsonAsync<TodoItem>($"/api/TodoItems/test", todoItem);
+         TodoItem responseTodoItem = await response.Content.ReadFromJsonAsync<TodoItem>();
 
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
+         return CreatedAtAction(nameof(GetTodoItem), new {id = responseTodoItem.Id}, responseTodoItem);
+      }
 
-            _context.TodoItems.Remove(todoItem);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool TodoItemExists(long id) =>
-             _context.TodoItems.Any(e => e.Id == id);
-
-        private static TodoItemDTO ItemToDTO(TodoItem todoItem) =>
-            new TodoItemDTO
-            {
-                Id = todoItem.Id,
-                Name = todoItem.Name,
-                IsComplete = todoItem.IsComplete
-            };
-        #endregion
-
-        // This method is just for testing populating the secret field
-        // POST: api/TodoItems/test
-        [HttpPost("test")]
-        public async Task<ActionResult<TodoItem>> PostTestTodoItem(TodoItem todoItem)
-        {
-            _context.TodoItems.Add(todoItem);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetTodoItem), new { id = todoItem.Id }, todoItem);
-        }
-
-        // This method is just for testing
-        // GET: api/TodoItems/test
-        [HttpGet("test")]
-        public async Task<ActionResult<IEnumerable<TodoItem>>> GetTestTodoItems()
-        {
-            return await _context.TodoItems.ToListAsync();
-        }
-    }
+      // This method is just for testing
+      // GET: api/TodoItems/test
+      [HttpGet("test")]
+      public async Task<ActionResult<IEnumerable<TodoItem>>> GetTestTodoItems()
+      {
+         var response = await _httpClient.GetFromJsonAsync<ActionResult<IEnumerable<TodoItem>>>($"/api/TodoItems/test");
+         return response;
+      }
+   }
 }

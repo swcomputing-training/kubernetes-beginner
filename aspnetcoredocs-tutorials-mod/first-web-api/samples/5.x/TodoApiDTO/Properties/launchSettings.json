@@ -4,7 +4,8 @@
          "commandName": "Project",
          "launchBrowser": true,
          "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "Development"
+            "ASPNETCORE_ENVIRONMENT": "Development",
+            "TODO_SERVICE_BASE_URL": "https://localhost:5101"
          },
          "applicationUrl": "https://localhost:51278;http://localhost:51279"
       },

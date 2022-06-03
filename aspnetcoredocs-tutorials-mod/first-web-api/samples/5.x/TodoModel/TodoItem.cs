@@ -1,5 +1,5 @@
 ﻿#region snippet
-namespace TodoApi.Models
+namespace TodoModel
 {
     public class TodoItem
     {
